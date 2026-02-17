@@ -1,0 +1,58 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: obs-signal-ingestor-config
+  namespace: zta-system
+data:
+  obs-ingestor.yaml: |
+    prometheus:
+      # Update this to your Prometheus URL if different.
+      url: "http://kube-prometheus-stack-prometheus.telemetry.svc.cluster.local:9090"
+      rules:
+        # Namespace-level 5xx rate (example assumes http_server_requests_seconds_count exists)
+        - name: "http-5xx-rate-prod"
+          assetType: "k8s_ns"
+          assetIdLabel: "namespace"
+          assetId: "prod"
+          threshold: 0
+          query: 'sum by (namespace) (rate(http_server_requests_seconds_count{namespace="prod",status=~"5.."}[5m]))'
+          scores:
+            IR: 2
+            VR: 2
+            RR: 8
+            ER: 4
+            confidence: 0.70
+
+        # CPU saturation (example using container_cpu_usage_seconds_total)
+        - name: "cpu-hot-prod"
+          assetType: "k8s_ns"
+          assetIdLabel: "namespace"
+          assetId: "prod"
+          threshold: 0.8
+          query: 'avg by (namespace) (rate(container_cpu_usage_seconds_total{namespace="prod"}[5m]))'
+          scores:
+            IR: 1
+            VR: 2
+            RR: 6
+            ER: 5
+            confidence: 0.60
+
+    loki:
+      # Update this to your Loki URL if different.
+      url: "http://loki.telemetry.svc.cluster.local:3100"
+      rules:
+        - name: "error-logs-prod"
+          assetType: "k8s_ns"
+          assetIdLabel: "namespace"
+          assetId: "prod"
+          threshold: 5
+          query: 'sum by (namespace) (count_over_time({namespace="prod"} |= "ERROR" [5m]))'
+          scores:
+            IR: 1
+            VR: 2
+            RR: 7
+            ER: 3
+            confidence: 0.65
+
+    tempo:
+      url: "http://tempo.telemetry.svc.cluster.local:3200"

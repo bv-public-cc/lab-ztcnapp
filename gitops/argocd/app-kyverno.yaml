@@ -1,0 +1,39 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kyverno
+  namespace: argocd
+spec:
+  project: cnapp-zta
+  source:
+    repoURL: https://kyverno.github.io/kyverno/
+    chart: kyverno
+    targetRevision: 3.2.6
+    helm:
+      releaseName: kyverno
+      valueFiles:
+        - values.yaml
+      # ArgoCD Helm valueFiles are relative to a "ref" repo unless you use sources[].
+      # To keep it simple, we inline minimal values here and also commit platform/kubernetes/kyverno/values.yaml
+      # for documentation/auditable pinning. If you want Argo to use the repo values.yaml directly, switch to
+      # "sources" (multi-source) and reference this repo file.
+      values: |
+        replicaCount: 1
+        cleanupController:
+          enabled: true
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kyverno
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: policy-admin-config
+  namespace: zta-system
+data:
+  vm_targets.yaml: |
+    vms:
+      app-vm:
+        host: "10.0.20.10"
+      attacker-vm:
+        host: "10.0.20.11"
+    ssh:
+      user: "zta-admin"

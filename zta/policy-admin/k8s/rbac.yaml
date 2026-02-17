@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: policy-admin
+  namespace: zta-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: policy-admin
+rules:
+  - apiGroups: ["zta.example.com"]
+    resources: ["ztadecisions"]
+    verbs: ["get","list","watch","patch","update"]
+  - apiGroups: ["zta.example.com"]
+    resources: ["ztadecisions/status"]
+    verbs: ["patch","update"]
+  - apiGroups: [""]
+    resources: ["namespaces","pods"]
+    verbs: ["get","list","watch","patch","update"]
+  - apiGroups: ["apps"]
+    resources: ["deployments","deployments/scale","replicasets"]
+    verbs: ["get","list","watch","patch","update"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: policy-admin
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: policy-admin
+subjects:
+  - kind: ServiceAccount
+    name: policy-admin
+    namespace: zta-system

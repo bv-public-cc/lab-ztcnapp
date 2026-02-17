@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cnapp-zta-platform
+  namespace: argocd
+spec:
+  project: cnapp-zta
+  source:
+    repoURL: "https://YOUR_GIT_URL/cnapp-zta-hybrid.git"
+    targetRevision: main
+    path: platform/kubernetes
+  destination:
+    server: "https://kubernetes.default.svc"
+    namespace: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

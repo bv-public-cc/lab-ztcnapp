@@ -1,0 +1,32 @@
+# Kyverno Helm values (lab-friendly)
+# Chart: https://github.com/kyverno/kyverno/tree/main/charts/kyverno
+#
+# Notes:
+# - Many environments will work with defaults; this file exists so you can pin settings for reproducibility.
+# - PolicyReports are typically enabled by default; keep reporting/metrics on for research evidence.
+
+replicaCount: 1
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 100m
+    memory: 256Mi
+
+# If your cluster is small, this helps reduce noise.
+cleanupController:
+  enabled: true
+
+# Enable metrics so Prometheus/Grafana can observe Kyverno activity (optional).
+metricsConfig:
+  metricsRefreshInterval: 24h
+
+# Recommended in many K3s labs; avoids strict PodSecurity warnings if applicable.
+podSecurityStandard: restricted
+
+# Feature flags may vary by Kyverno version/chart.
+# If your chart supports a 'config' block, you can set:
+# config:
+#   enablePolicyReports: "true"

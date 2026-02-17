@@ -1,0 +1,24 @@
+- name: Ensure nftables installed
+  become: true
+  dnf:
+    name: nftables
+    state: present
+
+- name: Deploy nftables rules
+  become: true
+  template:
+    src: "{{ nft_template }}"
+    dest: /etc/nftables.conf
+    mode: "0644"
+
+- name: Enable nftables service
+  become: true
+  systemd:
+    name: nftables
+    enabled: true
+
+- name: Restart nftables service
+  become: true
+  systemd:
+    name: nftables
+    state: restarted

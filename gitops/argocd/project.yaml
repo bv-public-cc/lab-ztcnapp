@@ -1,0 +1,18 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: cnapp-zta
+  namespace: argocd
+spec:
+  description: GitOps project for CNAPP-ZTA platform and policies
+  sourceRepos:
+    - "https://YOUR_GIT_URL/cnapp-zta-hybrid.git"
+  destinations:
+    - namespace: "*"
+      server: "https://kubernetes.default.svc"
+  clusterResourceWhitelist:
+    - group: "*"
+      kind: "*"
+  namespaceResourceWhitelist:
+    - group: "*"
+      kind: "*"

@@ -1,0 +1,53 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: observability-signal-ingestor-config
+  namespace: zta-system
+data:
+  obs_rules.yaml: |
+    intervalSeconds: 60
+
+    prometheus:
+      url: http://prometheus.telemetry.svc.cluster.local:9090
+    loki:
+      url: http://loki.telemetry.svc.cluster.local:3100
+    tempo:
+      url: http://tempo.telemetry.svc.cluster.local:3200
+
+    rules:
+      error_rate:
+        enabled: true
+        promql: sum(rate(http_server_duration_count{status_code=~"5.."}[5m])) by (k8s_namespace_name,k8s_deployment_name)
+        threshold: 0.1
+        evidenceMaxChars: 450
+
+      pod_restarts:
+        enabled: true
+        promql: sum(increase(kube_pod_container_status_restarts_total[5m])) by (namespace,pod)
+        threshold: 1
+        evidenceMaxChars: 450
+
+      latency_p95:
+        enabled: true
+        # Requires histogram bucket metrics; default matches common OTel http_server_duration_bucket
+        promql: histogram_quantile(0.95, sum(rate(http_server_duration_bucket[5m])) by (le,k8s_namespace_name,k8s_deployment_name))
+        threshold_ms: 250
+        evidenceMaxChars: 450
+
+      log_errors:
+        enabled: true
+        logql: '{k8s_namespace_name="prod"} |= "error"'
+        limit: 200
+        threshold: 10
+        assetType: k8s_ns
+        assetId: prod
+        evidenceMaxChars: 450
+
+      trace_errors:
+        enabled: true
+        query: 'service.name="otel-demo-app" status=error'
+        limit: 50
+        threshold: 5
+        assetType: k8s_deploy
+        assetId: prod/otel-demo-app
+        evidenceMaxChars: 450

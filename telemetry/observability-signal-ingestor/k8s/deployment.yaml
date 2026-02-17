@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: observability-signal-ingestor
+  namespace: zta-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: observability-signal-ingestor
+  template:
+    metadata:
+      labels:
+        app: observability-signal-ingestor
+    spec:
+      serviceAccountName: observability-signal-ingestor
+      containers:
+        - name: ingestor
+          image: REGISTRY_IP:5000/obs-signal-ingestor:0.1
+          env:
+            - name: CFG_PATH
+              value: /config/obs_rules.yaml
+          volumeMounts:
+            - name: config
+              mountPath: /config
+      volumes:
+        - name: config
+          configMap:
+            name: observability-signal-ingestor-config

@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: k8s-signal-ingestor
+  namespace: zta-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: k8s-signal-ingestor
+  template:
+    metadata:
+      labels:
+        app: k8s-signal-ingestor
+    spec:
+      serviceAccountName: k8s-signal-ingestor
+      containers:
+        - name: ingestor
+          image: REGISTRY_IP:5000/k8s-signal-ingestor:0.1
+          env:
+            - name: MAPPING_PATH
+              value: /config/mapping.yaml
+          volumeMounts:
+            - name: config
+              mountPath: /config
+      volumes:
+        - name: config
+          configMap:
+            name: k8s-signal-ingestor-config

@@ -1,0 +1,7 @@
+- name: Apply restrict firewall profile
+  hosts: vms
+  gather_facts: false
+  roles:
+    - role: firewall_nft
+      vars:
+        nft_template: nft-restrict.nft.j2

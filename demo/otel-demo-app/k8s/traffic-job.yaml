@@ -1,0 +1,24 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: otel-demo-traffic
+  namespace: prod
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: curl
+          image: curlimages/curl:8.7.1
+          command: ["sh","-c"]
+          args:
+            - |
+              set -e
+              echo "Generating traffic for 5 minutes..."
+              end=$(( $(date +%s) + 300 ))
+              while [ $(date +%s) -lt $end ]; do
+                curl -fsS http://otel-demo-app.prod.svc.cluster.local/ >/dev/null || true
+                curl -fsS "http://otel-demo-app.prod.svc.cluster.local/work?ms=50" >/dev/null || true
+                sleep 0.2
+              done
+              echo "Done."

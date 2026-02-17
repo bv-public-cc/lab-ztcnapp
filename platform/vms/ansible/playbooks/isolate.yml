@@ -1,0 +1,7 @@
+- name: Apply isolate firewall profile
+  hosts: vms
+  gather_facts: false
+  roles:
+    - role: firewall_nft
+      vars:
+        nft_template: nft-isolate.nft.j2

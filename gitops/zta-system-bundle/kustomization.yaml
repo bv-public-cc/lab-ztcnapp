@@ -1,0 +1,46 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../platform/kubernetes/namespaces.yaml
+  - ../../zta/crds/ztasignals.yaml
+  - ../../zta/crds/ztadecisions.yaml
+  - ../../zta/policy-engine/k8s/rbac.yaml
+  - ../../zta/policy-engine/k8s/configmap.yaml
+  - ../../zta/policy-engine/k8s/deployment.yaml
+  - ../../zta/policy-admin/k8s/rbac.yaml
+  - ../../zta/policy-admin/k8s/configmap.yaml
+  - ../../zta/policy-admin/k8s/ansible-configmap.yaml
+  - ../../zta/policy-admin/k8s/deployment.yaml
+  - ../../telemetry/k8s-signal-ingestor/k8s/rbac.yaml
+  - ../../telemetry/k8s-signal-ingestor/k8s/configmap.yaml
+  - ../../telemetry/k8s-signal-ingestor/k8s/deployment.yaml
+  - ../../telemetry/aws-signal-generator/k8s/rbac.yaml
+  - ../../telemetry/aws-signal-generator/k8s/cronjob.yaml
+  - ../../platform/kubernetes/telemetry/otel-collector/configmap.yaml
+  - ../../platform/kubernetes/telemetry/otel-collector/deployment.yaml
+  - ../../platform/kubernetes/telemetry/otel-collector/service.yaml
+  - ../../platform/kubernetes/telemetry/tempo/configmap.yaml
+  - ../../platform/kubernetes/telemetry/tempo/deployment.yaml
+  - ../../platform/kubernetes/telemetry/tempo/service.yaml
+  - ../../platform/kubernetes/telemetry/tempo/grafana-datasource.yaml
+  - ../../platform/kubernetes/network/quarantine/prod-quarantine-labelpolicies.yaml
+  - ../../platform/kubernetes/policies/kyverno/cluster/disallow-privileged.yaml
+  - ../../platform/kubernetes/policies/kyverno/cluster/disallow-hostpath.yaml
+  - ../../platform/kubernetes/policies/kyverno/cluster/require-run-as-non-root.yaml
+  - ../../platform/kubernetes/policies/kyverno/cluster/require-requests-limits.yaml
+  - ../../platform/kubernetes/policies/kyverno/cluster/verify-image-signature-placeholder.yaml
+  - ../../platform/kubernetes/policies/kyverno/namespaced/prod-require-labels.yaml
+  - ../../telemetry/obs-signal-ingestor/k8s/rbac.yaml
+  - ../../telemetry/obs-signal-ingestor/k8s/configmap.yaml
+  - ../../telemetry/obs-signal-ingestor/k8s/cronjob.yaml
+  - ../../platform/kubernetes/telemetry/loki/configmap.yaml
+  - ../../platform/kubernetes/telemetry/loki/deployment.yaml
+  - ../../platform/kubernetes/telemetry/loki/service.yaml
+  - ../../platform/kubernetes/telemetry/prometheus/configmap.yaml
+  - ../../platform/kubernetes/telemetry/prometheus/deployment.yaml
+  - ../../platform/kubernetes/telemetry/prometheus/service.yaml
+  - ../../telemetry/observability-signal-ingestor/k8s/rbac.yaml
+  - ../../telemetry/observability-signal-ingestor/k8s/configmap.yaml
+  - ../../telemetry/observability-signal-ingestor/k8s/deployment.yaml
+  - ../argocd/app-kube-state-metrics.yaml

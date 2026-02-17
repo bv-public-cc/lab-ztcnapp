@@ -1,0 +1,33 @@
+# Placeholder: image signature verification requires your cosign public key/attestor and registry patterns.
+# Keep this file as a thesis artifact to show the CNAPP "image signature verification" capability mapping.
+#
+# To implement for real:
+# - Install Kyverno + kyverno-policy-reporter (optional)
+# - Configure cosign public key secret
+# - Set allowed registries and image patterns
+# - Switch validationFailureAction to enforce (or audit) per research model
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: verify-image-signature-placeholder
+spec:
+  validationFailureAction: audit
+  background: false
+  rules:
+    - name: verify-signature
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+      verifyImages:
+        - imageReferences:
+            - "registry.example.com/*"
+          attestors:
+            - count: 1
+              entries:
+                - keys:
+                    publicKeys: |
+                      -----BEGIN PUBLIC KEY-----
+                      REPLACE_ME
+                      -----END PUBLIC KEY-----

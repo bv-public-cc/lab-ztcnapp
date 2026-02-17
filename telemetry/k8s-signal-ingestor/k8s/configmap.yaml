@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: k8s-signal-ingestor-config
+  namespace: zta-system
+data:
+  mapping.yaml: |
+    default:
+      IR: 3
+      VR: 7
+      RR: 2
+      ER: 2
+      confidence: 0.90
+    policies:
+      disallow-privileged:
+        default:
+          IR: 6
+          VR: 9
+          RR: 3
+          ER: 2
+          confidence: 0.95
+      disallow-hostpath:
+        default:
+          IR: 5
+          VR: 8
+          RR: 3
+          ER: 2
+          confidence: 0.95

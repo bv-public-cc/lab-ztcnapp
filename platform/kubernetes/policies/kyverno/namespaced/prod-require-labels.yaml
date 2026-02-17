@@ -1,0 +1,21 @@
+apiVersion: kyverno.io/v1
+kind: Policy
+metadata:
+  name: prod-require-app-label
+  namespace: prod
+spec:
+  validationFailureAction: audit
+  background: true
+  rules:
+    - name: require-app-label
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+      validate:
+        message: "Pods should include app label for inventory + telemetry correlation."
+        pattern:
+          metadata:
+            labels:
+              app: "?*"

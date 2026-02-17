@@ -1,0 +1,79 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: policy-admin
+  namespace: zta-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: policy-admin
+  template:
+    metadata:
+      labels:
+        app: policy-admin
+    spec:
+      serviceAccountName: policy-admin
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        fsGroup: 10001
+      volumes:
+        - name: repo
+          emptyDir: {}
+        - name: cache
+          emptyDir: {}
+        - name: sshkey
+          secret:
+            secretName: pa-ssh-key
+            defaultMode: 0400
+        - name: knownhosts
+          configMap:
+            name: pa-known-hosts
+        - name: config
+          configMap:
+            name: policy-admin-config
+        - name: ansiblecfg
+          configMap:
+            name: pa-ansible-config
+      initContainers:
+        - name: git-clone
+          image: alpine/git:2.45.2
+          env:
+            - name: REPO_URL
+              value: "https://YOUR_GIT_URL/cnapp-zta-hybrid.git"
+          command: ["sh","-c"]
+          args: ["git clone --depth=1 ${REPO_URL} /repo"]
+          volumeMounts:
+            - name: repo
+              mountPath: /repo
+      containers:
+        - name: pa
+          image: REGISTRY_IP:5000/zta-pa:0.3
+          env:
+            - name: VM_CONFIG
+              value: /config/vm_targets.yaml
+            - name: ANSIBLE_CONFIG
+              value: /etc/ansible/ansible.cfg
+            - name: PA_CACHE_PATH
+              value: /cache/state.json
+            - name: PA_COOLDOWN_SECONDS
+              value: "1800"
+          envFrom:
+            - secretRef:
+                name: aws-creds
+          volumeMounts:
+            - name: repo
+              mountPath: /repo
+            - name: cache
+              mountPath: /cache
+            - name: config
+              mountPath: /config
+            - name: ansiblecfg
+              mountPath: /etc/ansible
+            - name: sshkey
+              mountPath: /home/app/.ssh/id_ed25519
+              subPath: id_ed25519
+            - name: knownhosts
+              mountPath: /home/app/.ssh/known_hosts
+              subPath: known_hosts

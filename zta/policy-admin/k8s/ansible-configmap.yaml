@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pa-ansible-config
+  namespace: zta-system
+data:
+  ansible.cfg: |
+    [defaults]
+    host_key_checking = True
+    retry_files_enabled = False
+    stdout_callback = yaml
+    timeout = 10
+    forks = 10
+    interpreter_python = auto_silent
+
+    [ssh_connection]
+    pipelining = True

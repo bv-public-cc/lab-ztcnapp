@@ -1,0 +1,5 @@
+telemetry_sink_ip: "10.0.10.50"
+mgmt_cidr: "10.0.10.0/24"
+allow_dns: true
+allow_patch_repo: false
+patch_repo_cidr: "10.0.30.0/24"

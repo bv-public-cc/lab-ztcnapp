@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pa-known-hosts
+  namespace: zta-system
+data:
+  # Populate with pinned host keys for your VM targets
+  # Example line (generate with: ssh-keyscan -H <ip>):
+  # 10.0.20.10 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAA...
+  known_hosts: |
+    REPLACE_WITH_SSH_KNOWN_HOSTS_ENTRIES

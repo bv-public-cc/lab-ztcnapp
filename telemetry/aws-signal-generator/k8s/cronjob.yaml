@@ -1,0 +1,19 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: aws-signal-generator
+  namespace: zta-system
+spec:
+  schedule: "*/5 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: aws-signal-generator
+          restartPolicy: Never
+          containers:
+            - name: gen
+              image: REGISTRY_IP:5000/aws-signal-gen:0.2
+              envFrom:
+                - secretRef:
+                    name: aws-creds

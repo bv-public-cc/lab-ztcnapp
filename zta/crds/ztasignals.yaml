@@ -1,0 +1,39 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: ztasignals.zta.example.com
+spec:
+  group: zta.example.com
+  scope: Cluster
+  names:
+    plural: ztasignals
+    singular: ztasignal
+    kind: ZTASignal
+  versions:
+    - name: v1alpha1
+      served: true
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              required: ["assetId","assetType"]
+              properties:
+                assetId: { type: string }
+                assetType: { type: string }
+                IR: { type: number }
+                VR: { type: number }
+                RR: { type: number }
+                ER: { type: number }
+                confidence: { type: number }
+                observations:
+                  type: array
+                  items: { type: string }
+            status:
+              type: object
+              properties:
+                processed: { type: boolean }
+      subresources:
+        status: {}

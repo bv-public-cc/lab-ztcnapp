@@ -1,0 +1,9 @@
+replicas: 1
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    cpu: 300m
+    memory: 256Mi
+# Keep defaults; chart exposes many tunables but this is enough for lab evidence.

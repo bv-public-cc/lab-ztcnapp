@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: otel-demo-app
+  namespace: prod
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: otel-demo-app
+  template:
+    metadata:
+      labels:
+        app: otel-demo-app
+    spec:
+      containers:
+        - name: app
+          image: REGISTRY_IP:5000/otel-demo-app:0.1
+          ports:
+            - containerPort: 8080
+          env:
+            - name: OTEL_SERVICE_NAME
+              value: "otel-demo-app"
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: "http://otel-collector.telemetry.svc.cluster.local:4318"
+            # keep protocol implicit for this exporter; it uses OTLP/HTTP
+            - name: DOWNSTREAM_URL
+              value: ""

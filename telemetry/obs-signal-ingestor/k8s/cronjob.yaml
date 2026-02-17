@@ -1,0 +1,26 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: obs-signal-ingestor
+  namespace: zta-system
+spec:
+  schedule: "*/2 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: obs-signal-ingestor
+          restartPolicy: Never
+          containers:
+            - name: ingestor
+              image: REGISTRY_IP:5000/obs-signal-ingestor:0.1
+              env:
+                - name: OBS_CFG
+                  value: /config/obs-ingestor.yaml
+              volumeMounts:
+                - name: config
+                  mountPath: /config
+          volumes:
+            - name: config
+              configMap:
+                name: obs-signal-ingestor-config
