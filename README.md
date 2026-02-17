@@ -68,9 +68,6 @@ kubectl apply -f platform/kubernetes/network/quarantine/prod-quarantine-labelpol
 ## Safety note
 The AWS SG “lockdown” action revokes public ingress on sensitive ports. Run only in test accounts/VPCs.
 
----
-If you want, add a `docs/` folder with screenshots (Grafana Tempo datasource, Argo sync status, decision evidence) for committee-ready artifacts.
-
 ## Ops glue (required secrets/config)
 Apply the templates after you fill in values:
 - `platform/kubernetes/ops/pa-ssh-key-secret-template.yaml`
