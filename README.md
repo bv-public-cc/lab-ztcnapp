@@ -1,17 +1,79 @@
 # CNAPP ↔ Zero Trust (800-207) Hybrid Lab 
 
-This repo implements a practical, cloud-agnostic research prototype that integrates **CNAPP capability domains**
-with **NIST SP 800-207 Zero Trust Architecture** constructs in a hybrid environment:
+Learning and research project to integrate **CNAPP capability domains** with **NIST SP 800-207 Zero Trust Architecture** in a hybrid environment.
+
+
+## ZTA and CNAPP Mapping Purpose
+
+The most important file in this projcet is:
+
+```
+docs/CNAPP_Taxonomy_ZTA.xlsx
+```
+This workbook contains the taxonomy, alignment logic, and scoring model.  During schoolwork, and trying to understand implementations of CNAPP with Zero Trust Architectures (ZTA), a search was done to find formal mappings.  It seems to be something that is missing that formally ties CNAPP capabilities to the a regulated ZTA framework that could be auditable by a governance body.  
+
+So, in a vain attempt, this workbook is a formal mapping of CNAPP capabilities to specific NIST SP 800-207 constructs in a way that can be used for quantitative analysis and scoring.
+
+It defines seven CNAPP capability domains and maps each capability to:
+
+  - A primary Zero Trust tenet
+  - A Zero Trust component (Policy Engine, Policy Administrator, Policy Enforcement Point)
+  - An enforcement decision type (Prevent, Detect, Contain, Recover, Remediate)
+  - The target environment (Kubernetes, VM, AWS)
+  - A Trust Signal category (Identity, Vulnerability, Runtime, Exposure)
+  - Supporting notes and rationale
+
+The Trust Signal category defined in the workbook directly maps to the normalized `ZTASignal` objects used by the lab’s Trust Algorithm.
+
+The workbook models the theory and scoring logic.
+
+This repository implements that logic in a working system, though it is still heavily a work in progress.
+
+This lab is not meant to be a full CNAPP implementation, but rather a reference architecture that demonstrates how CNAPP capabilities can be systematically evaluated and operationalized within a Zero Trust framework.
+
+Mainly it is meant to be a personal learning project (which I hope to turn into my SANS MSISE project), and is not designed to replace commercial CNAPP platforms, but to help understand the mapping and how to operationalize it in a transparent, measurable way.
+
+---
+
+## Trust Algorithm, Trust Score, and Decision
+
+The Trust Score in this lab is a weighted scoring model that translates CNAPP-derived signals into enforceable Zero Trust decisions.
+
+Each `ZTASignal` contains normalized risk dimensions:
+
+  - IR — Identity Risk
+  - VR — Vulnerability Risk
+  - RR — Runtime Risk
+  - ER — Exposure Risk
+
+The Policy Engine computes a composite score using configurable weights defined in:
+
+```
+zta/policy-engine/config/weights.yaml
+zta/policy-engine/k8s/configmap.yaml
+```
+
+The resulting Trust Score is evaluated against defined thresholds to determine:
+
+  - ALLOW
+  - RESTRICT
+  - QUARANTINE
+  - ISOLATE
+
+The Excel workbook includes simulation worksheets that demonstrate how changes in risk inputs affect trust and enforcement outcomes. In the lab, this logic is implemented by the Policy Engine controller in `zta/policy-engine/`.
+
+
+### Core loop (800-207)
+**Telemetry → PE → PA → PEP**
+- Telemetry sources create normalized `ZTASignal` objects.
+- PE computes Trust Score and emits `ZTADecision` objects.
+- PA enforces actions across PEPs (K8s labels/NetworkPolicy, VM nftables, AWS SG lockdown) and writes evidence.
+
 
 - **K3s (3-node)** runs: Policy Engine (PE), Policy Admin (PA), signal ingestors, telemetry stack.
 - **Rocky Linux VMs** are enforceable targets (via SSH + Ansible + nftables).
 - **AWS (optional)** provides control-plane telemetry and enforceable PEPs (Security Groups).
 
-## Core loop (800-207)
-**Telemetry → PE → PA → PEP**
-- Telemetry sources create normalized `ZTASignal` objects.
-- PE computes Trust Score and emits `ZTADecision` objects.
-- PA enforces actions across PEPs (K8s labels/NetworkPolicy, VM nftables, AWS SG lockdown) and writes evidence.
 
 ## Components
 - `zta/crds`: CRDs for `ZTASignal` and `ZTADecision`
@@ -67,6 +129,9 @@ kubectl apply -f platform/kubernetes/network/quarantine/prod-quarantine-labelpol
 
 ## Safety note
 The AWS SG “lockdown” action revokes public ingress on sensitive ports. Run only in test accounts/VPCs.
+
+---
+If you want, add a `docs/` folder with screenshots (Grafana Tempo datasource, Argo sync status, decision evidence) for committee-ready artifacts.
 
 ## Ops glue (required secrets/config)
 Apply the templates after you fill in values:
